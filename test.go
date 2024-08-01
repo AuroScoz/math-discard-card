@@ -30,36 +30,40 @@ func test() {
 	game.NewPlayer(100)
 	game.InitCardGame(10, 1, 1)
 
-	card1 := card.NewCard(card.Clubs, 1)
-	card2 := card.NewCard(card.Diamonds, 1)
-	card3 := card.NewCard(card.Hearts, 1)
+	card1 := card.NewCard(card.Clubs, 5)
+	card2 := card.NewCard(card.Clubs, 6)
+	card3 := card.NewCard(card.Hearts, 12)
 	card4 := card.NewCard(card.Diamonds, 4)
-	card5 := card.NewCard(card.Hearts, 10)
+	card5 := card.NewCard(card.Spades, 10)
 
 	cardIdxs := []int{card1.Idx, card2.Idx, card3.Idx, card4.Idx, card5.Idx}
 	game.MyGame.NewGame(cardIdxs...)
 
-	logrus.Infof("total: %v", len(game.MyGame.Deck))
+	discardCount := 3
+	combinations := getHandCombinations(game.MyGame.Deck, discardCount)
 
-	combinations := getHandCombinations(game.MyGame.Deck, 2)
+	targetType := card.Pair
 
-	var fullHouseCount int
+	var targetTypeCount int
 	for _, combo := range combinations {
 		hand := []*card.Card{
 			card1,
 			card2,
-			card3,
 		}
 		hand = append(hand, combo...)
-		if card.IsFullHouse(hand) {
-			fullHouseCount++
+		// if card.IsOnlyHighCard(hand) {
+		// 	targetTypeCount++
+		// }
+		if card.IsHandType(hand, targetType) && !card.IsHandType(hand, card.FullHouse) && !card.IsHandType(hand, card.ThreeOfAKind) {
+			targetTypeCount++
 		}
 	}
 
 	totalCombinations := len(combinations)
-	probability := float64(fullHouseCount) / float64(totalCombinations)
+	probability := float64(targetTypeCount) / float64(totalCombinations)
 
-	logrus.Printf("Total Combinations: %d", totalCombinations)
-	logrus.Printf("Combinations: %d", fullHouseCount)
-	logrus.Printf("Probability : %.4f", probability)
+	logrus.Infof("換%v張", discardCount)
+	logrus.Printf("總組合數: %d", totalCombinations)
+	logrus.Printf("%s有幾總組合: %d", targetType.ToString(), targetTypeCount)
+	logrus.Printf("%s出線機率: %.10f", targetType.ToString(), probability)
 }

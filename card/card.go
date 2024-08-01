@@ -141,6 +141,34 @@ func GetHandType(cards []*Card) HandType {
 	}
 }
 
+func IsHandType(cards []*Card, handType HandType) bool {
+	switch handType {
+	case StraightFlush:
+		return IsStraightFlush(cards)
+	case FourOfAKind:
+		return IsFourOfAKind(cards)
+	case FullHouse:
+		return IsFullHouse(cards)
+	case ThreeOfAKind:
+		return IsThreeOfAKind(cards)
+	case Straight:
+		return IsStraight(cards)
+	case Flush:
+		return IsFlush(cards)
+	case Pair:
+		return IsPair(cards)
+	case HighCard:
+		return true
+	default:
+		log.Errorf("尚未定義的HandType: %s", handType.ToString())
+		return false
+	}
+}
+
+func IsOnlyHighCard(cards []*Card) bool {
+	return !IsStraightFlush(cards) && !IsFourOfAKind(cards) && !IsFullHouse(cards) && !IsThreeOfAKind(cards) && !IsStraight(cards) && !IsFlush(cards) && !IsPair(cards)
+}
+
 func IsFlush(cards []*Card) bool {
 	suitDics := make(map[SuitType]int)
 	for _, card := range cards {
